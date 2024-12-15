@@ -1,4 +1,4 @@
-import time 
+import time
 
 from PyQt5.QtWidgets import (
     QStackedLayout,
@@ -9,10 +9,10 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QPushButton,
     QLineEdit,
-    QWidget, 
+    QWidget,
     QLabel
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QFont
 
 class Main_window(QMainWindow):
@@ -25,7 +25,7 @@ class Main_window(QMainWindow):
         layout_hori = QHBoxLayout()
         self.layout_stak = QStackedLayout()
 
-        self.timer = Timer(0, 1)
+        self.timer = Timer(10, 0)
         self.timer_input = Time_input()
 
         start_btn = QPushButton(text="Start")
@@ -50,11 +50,11 @@ class Main_window(QMainWindow):
         self.show()
 
     def hide_input(self):
-        print("called")
         self.layout_stak.setCurrentIndex(0)
         self.timer.countdown()
-    
+
     def show_input(self):
+
         self.layout_stak.setCurrentIndex(1)
 
 class Timer(QWidget):
@@ -71,19 +71,33 @@ class Timer(QWidget):
         self.label.setFont(QFont("Arial", 80))
         self.layout.addWidget(self.label)
 
-
     def countdown(self):
-        while self.t:
-            print("Yes")
-            self.mins, self.secs = divmod(self.t, 60)
-            self.label.setText("{:02d}:{:02d}".format(self.mins, self.secs))
-            QApplication.processEvents()
+        self.thread = Worker(self.t)
+        self.thread.start()
+        self.thread.progress.connect(self.update_timer)
+
+    def update_timer(self, inp):
+        self.label.setText("{:02d}:{:02d}".format(inp[0], inp[1]))
+
+class Worker(QThread):
+
+    def __init__(self, t):
+        super(Worker, self).__init__()
+        self.t = t
+    
+    progress = pyqtSignal(tuple)
+    def run(self):
+        while self.t > -1:
+            mins, secs = divmod(self.t, 60)
+            self.progress.emit((mins, secs))
             time.sleep(1)
 
             self.t -= 1
 
 class Time_input(QWidget):
     def __init__(self):
+
+        self.def_sec, self.def_min = 0, 15      # Needs to be taken from a config file
         super(Time_input, self).__init__()
 
         widget = QWidget
@@ -91,11 +105,16 @@ class Time_input(QWidget):
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
-        minutes = QLineEdit()
-        seconds = QLineEdit()
+        self.minutes = QLineEdit()
+        self.minutes.setPlaceholderText = str(self.def_min)
+        self.seconds = QLineEdit()
+        self.seconds.setPlaceholderText = str(self.def_sec)
 
-        self.layout.addWidget(minutes)
-        self.layout.addWidget(seconds)
+        self.layout.addWidget(self.minutes)
+        self.layout.addWidget(self.seconds)
+
+    def return_input(self):
+        return m
 
 if __name__ == "__main__":
 
