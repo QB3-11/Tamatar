@@ -19,26 +19,34 @@ class Main_window(QMainWindow):
     def __init__(self, title:str):
         super(Main_window, self).__init__()
 
+        self.Font = QFont("Anton", 90)
+
         self.setWindowTitle(title)
         self.setFixedSize(300, 200)
+
         layout_vert = QVBoxLayout()
         layout_hori = QHBoxLayout()
         self.layout_stak = QStackedLayout()
 
-        self.timer = Timer(10, 0)
-        self.timer_input = Time_input()
+        self.timer = Timer()                   
+        self.timer.setFont(self.Font)
 
-        start_btn = QPushButton(text="Start")
-        reset_btn = QPushButton(text="Reset")
+        self.timer_input = Time_input(0, 10)             # Change to default value from a config file
+        self.timer_input.setFont(self.Font)
+        self.timer_input.minutes.setPlaceholderText("00")
+        self.timer_input.seconds.setPlaceholderText("10")
 
-        start_btn.clicked.connect(self.hide_input)
-        reset_btn.clicked.connect(self.show_input)
+        self.start_btn = QPushButton(text="Start")
+        self.reset_btn = QPushButton(text="Reset")
 
-        layout_hori.addWidget(start_btn)
-        layout_hori.addWidget(reset_btn)
+        self.start_btn.clicked.connect(self.hide_input)
+        self.reset_btn.clicked.connect(self.show_input)
+
+        layout_hori.addWidget(self.start_btn)
+        layout_hori.addWidget(self.reset_btn)
         self.layout_stak.addWidget(self.timer)
         self.layout_stak.addWidget(self.timer_input) #index = 1
-
+        self.layout_stak.setCurrentIndex(1)
 
         layout_vert.addLayout(self.layout_stak)
         layout_vert.addLayout(layout_hori)
@@ -51,40 +59,48 @@ class Main_window(QMainWindow):
 
     def hide_input(self):
         self.layout_stak.setCurrentIndex(0)
+        self.timer.update_time(self.timer_input.return_input())
         self.timer.countdown()
 
     def show_input(self):
-
+        for thread in self.timer.threads:
+            thread.terminate()
         self.layout_stak.setCurrentIndex(1)
+        
 
 class Timer(QWidget):
-    def __init__(self, seconds=0, minutes=0):
+    def __init__(self):
         super(Timer, self).__init__()
 
-        self.t = seconds + minutes * 60
+        self.t = 0
+        self.threads = []
 
         self.layout = QHBoxLayout()
         self.layout.setAlignment(Qt.AlignCenter)
         self.setLayout(self.layout)
 
-        self.label = QLabel("{:02d}:{:02d}".format(minutes, seconds))
-        self.label.setFont(QFont("Arial", 80))
+        self.label = QLabel()
+  
         self.layout.addWidget(self.label)
 
     def countdown(self):
         self.thread = Worker(self.t)
+        self.threads.append(self.thread)
         self.thread.start()
         self.thread.progress.connect(self.update_timer)
 
-    def update_timer(self, inp):
+    def update_timer(self, inp:tuple):
         self.label.setText("{:02d}:{:02d}".format(inp[0], inp[1]))
+    
+    def update_time(self, inp:tuple):
+        self.t = inp[0] * 60 + inp[1]
 
 class Worker(QThread):
 
     def __init__(self, t):
         super(Worker, self).__init__()
         self.t = t
-    
+
     progress = pyqtSignal(tuple)
     def run(self):
         while self.t > -1:
@@ -95,10 +111,11 @@ class Worker(QThread):
             self.t -= 1
 
 class Time_input(QWidget):
-    def __init__(self):
-
-        self.def_sec, self.def_min = 0, 15      # Needs to be taken from a config file
+    def __init__(self, def_min, def_sec):
         super(Time_input, self).__init__()
+
+        self.def_min = def_min
+        self.def_sec = def_sec
 
         widget = QWidget
 
@@ -106,15 +123,27 @@ class Time_input(QWidget):
         self.setLayout(self.layout)
 
         self.minutes = QLineEdit()
-        self.minutes.setPlaceholderText = str(self.def_min)
         self.seconds = QLineEdit()
-        self.seconds.setPlaceholderText = str(self.def_sec)
+
+        self.minutes.setFixedSize(130, 140)
+        self.seconds.setFixedSize(130, 140)
 
         self.layout.addWidget(self.minutes)
         self.layout.addWidget(self.seconds)
 
+        self.setFocus()
+
     def return_input(self):
-        return m
+        minutes = self.minutes.text()
+        seconds = self.seconds.text()
+
+        if minutes == "":
+            minutes = self.def_min
+        if seconds == "":
+            seconds = self.def_sec
+        
+        return (int(minutes), int(seconds))
+
 
 if __name__ == "__main__":
 
