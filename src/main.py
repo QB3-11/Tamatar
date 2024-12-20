@@ -12,8 +12,12 @@ from PyQt5.QtWidgets import (
     QWidget,
     QLabel
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import (
+    Qt,
+    QThread,
+    pyqtSignal
+)
+from PyQt5.QtGui import QFont, QIntValidator
 
 class Main_window(QMainWindow):
     def __init__(self, title:str):
@@ -112,6 +116,8 @@ class Time_input(QWidget):
         self.def_min = def_min
         self.def_sec = def_sec
 
+        validator = QIntValidator(0, 60, self)
+
         widget = QWidget
 
         self.layout = QHBoxLayout()
@@ -124,6 +130,9 @@ class Time_input(QWidget):
         self.seconds.setFixedSize(120, 140)
         self.minutes.setPlaceholderText("{:02d}".format(def_min))
         self.seconds.setPlaceholderText("{:02d}".format(def_sec))
+
+        self.minutes.setValidator(validator)
+        self.seconds.setValidator(validator)
 
         self.layout.addWidget(self.minutes)
         self.layout.addWidget(self.seconds)
