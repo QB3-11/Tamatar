@@ -1,4 +1,4 @@
-import time
+import sys, time
 
 from PyQt5.QtWidgets import (
     QStackedLayout,
@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QPushButton,
+    QShortcut,
     QLineEdit,
     QWidget,
     QLabel
@@ -19,6 +20,7 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtGui import (
     QFont,
+    QKeySequence,
     QIntValidator,
     QFontDatabase
 )
@@ -30,6 +32,9 @@ class Main_window(QMainWindow):
         QFontDatabase.addApplicationFont("./assets/font/Anton-Regular.otf")
         self.Font = QFont("Anton-Regular", 60)
         self.Font.setBold(True)
+
+        self.shortcut_q = QShortcut(QKeySequence("ctrl+q"), self)
+        self.shortcut_q.activated.connect(sys.exit)
 
         self.setWindowTitle(title)
         self.setFixedSize(300, 200)
@@ -159,7 +164,7 @@ class Time_input(QWidget):
 
 if __name__ == "__main__":
 
-    app = QApplication([])
+    app = QApplication(sys.argv)
     window = Main_window("Tamatar")
 
     app.exec()
