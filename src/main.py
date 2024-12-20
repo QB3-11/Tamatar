@@ -19,7 +19,7 @@ class Main_window(QMainWindow):
     def __init__(self, title:str):
         super(Main_window, self).__init__()
 
-        self.Font = QFont("Anton", 90)
+        self.Font = QFont("Anton", 60)
 
         self.setWindowTitle(title)
         self.setFixedSize(300, 200)
@@ -31,11 +31,8 @@ class Main_window(QMainWindow):
         self.timer = Timer()                   
         self.timer.setFont(self.Font)
 
-        self.timer_input = Time_input(0, 10)             # Change to default value from a config file
+        self.timer_input = Time_input(1, 0)             # Change to default value from a config file
         self.timer_input.setFont(self.Font)
-        self.timer_input.minutes.setPlaceholderText("00")
-        self.timer_input.seconds.setPlaceholderText("10")
-
         self.start_btn = QPushButton(text="Start")
         self.reset_btn = QPushButton(text="Reset")
 
@@ -63,8 +60,7 @@ class Main_window(QMainWindow):
         self.timer.countdown()
 
     def show_input(self):
-        for thread in self.timer.threads:
-            thread.terminate()
+        self.timer.threads.terminate()
         self.layout_stak.setCurrentIndex(1)
         
 
@@ -73,7 +69,7 @@ class Timer(QWidget):
         super(Timer, self).__init__()
 
         self.t = 0
-        self.threads = []
+        self.threads = None
 
         self.layout = QHBoxLayout()
         self.layout.setAlignment(Qt.AlignCenter)
@@ -84,10 +80,9 @@ class Timer(QWidget):
         self.layout.addWidget(self.label)
 
     def countdown(self):
-        self.thread = Worker(self.t)
-        self.threads.append(self.thread)
-        self.thread.start()
-        self.thread.progress.connect(self.update_timer)
+        self.threads = Worker(self.t)
+        self.threads.start()
+        self.threads.progress.connect(self.update_timer)
 
     def update_timer(self, inp:tuple):
         self.label.setText("{:02d}:{:02d}".format(inp[0], inp[1]))
@@ -125,8 +120,10 @@ class Time_input(QWidget):
         self.minutes = QLineEdit()
         self.seconds = QLineEdit()
 
-        self.minutes.setFixedSize(130, 140)
-        self.seconds.setFixedSize(130, 140)
+        self.minutes.setFixedSize(120, 140)
+        self.seconds.setFixedSize(120, 140)
+        self.minutes.setPlaceholderText("{:02d}".format(def_min))
+        self.seconds.setPlaceholderText("{:02d}".format(def_sec))
 
         self.layout.addWidget(self.minutes)
         self.layout.addWidget(self.seconds)
