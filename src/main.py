@@ -75,7 +75,8 @@ class Main_window(QMainWindow):
         self.timer.countdown()
 
     def show_input(self):
-        self.timer.threads.terminate()
+        for thread in self.timer.threads:
+            thread.terminate()
         self.layout_stak.setCurrentIndex(1)
         
 
@@ -84,7 +85,7 @@ class Timer(QWidget):
         super(Timer, self).__init__()
 
         self.t = 0
-        self.threads = None
+        self.threads = []
 
         self.layout = QHBoxLayout()
         self.layout.setAlignment(Qt.AlignCenter)
@@ -95,9 +96,10 @@ class Timer(QWidget):
         self.layout.addWidget(self.label)
 
     def countdown(self):
-        self.threads = Worker(self.t)
-        self.threads.start()
-        self.threads.progress.connect(self.update_timer)
+        self.thread = Worker(self.t)
+        self.threads.append(self.thread)
+        self.thread.start()
+        self.thread.progress.connect(self.update_timer)
 
     def update_timer(self, inp:tuple):
         self.label.setText("{:02d}:{:02d}".format(inp[0], inp[1]))
