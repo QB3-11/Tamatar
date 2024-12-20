@@ -17,13 +17,19 @@ from PyQt5.QtCore import (
     QThread,
     pyqtSignal
 )
-from PyQt5.QtGui import QFont, QIntValidator
+from PyQt5.QtGui import (
+    QFont,
+    QIntValidator,
+    QFontDatabase
+)
 
 class Main_window(QMainWindow):
     def __init__(self, title:str):
         super(Main_window, self).__init__()
 
-        self.Font = QFont("Anton", 60)
+        QFontDatabase.addApplicationFont("./assets/font/Anton-Regular.otf")
+        self.Font = QFont("Anton-Regular", 60)
+        self.Font.setBold(True)
 
         self.setWindowTitle(title)
         self.setFixedSize(300, 200)
