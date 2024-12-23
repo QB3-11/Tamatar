@@ -30,7 +30,7 @@ class Main_window(QMainWindow):
         super(Main_window, self).__init__()
 
         QFontDatabase.addApplicationFont("./assets/font/Anton-Regular.otf")
-        self.Font = QFont("Anton-Regular", 60)
+        self.Font = QFont("Anton-Regular", 50)
         self.Font.setBold(True)
 
         self.shortcut_q = QShortcut(QKeySequence("ctrl+q"), self)
@@ -70,17 +70,22 @@ class Main_window(QMainWindow):
         self.show()
 
     def hide_input(self):
-        self.layout_stak.setCurrentIndex(0)
+        self.terminate_threads()
+
         time_inpt = self.timer_input.return_input()
         self.timer.update_timer(time_inpt)
         self.timer.t = time_inpt[0] * 60 + time_inpt[1]
+
+        self.layout_stak.setCurrentIndex(0)
         self.timer.countdown()
 
     def show_input(self):
+        self.terminate_threads()
+        self.layout_stak.setCurrentIndex(1)
+
+    def terminate_threads(self):
         for thread in self.timer.threads:
             thread.terminate()
-        self.layout_stak.setCurrentIndex(1)
-        
 
 class Timer(QWidget):
     def __init__(self):
@@ -102,7 +107,7 @@ class Timer(QWidget):
         self.threads.append(self.thread)
         self.thread.start()
         self.thread.progress.connect(self.update_timer)
-
+        
     def update_timer(self, inp:tuple):
         self.label.setText("{:02d}:{:02d}".format(inp[0], inp[1]))
     
@@ -138,8 +143,8 @@ class Time_input(QWidget):
         self.minutes = QLineEdit()
         self.seconds = QLineEdit()
 
-        self.minutes.setFixedSize(120, 140)
-        self.seconds.setFixedSize(120, 140)
+        self.minutes.setFixedSize(100, 110)
+        self.seconds.setFixedSize(100, 110)
         self.minutes.setPlaceholderText("{:02d}".format(def_min))
         self.seconds.setPlaceholderText("{:02d}".format(def_sec))
 
@@ -162,6 +167,8 @@ class Time_input(QWidget):
         
         return (int(minutes), int(seconds))
 
+class Float_window(QWidget):
+    pass
 
 if __name__ == "__main__":
 
