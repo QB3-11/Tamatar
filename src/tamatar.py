@@ -31,7 +31,6 @@ class Main_window(QMainWindow):
 
         QFontDatabase.addApplicationFont("./assets/font/Anton-Regular.otf")
         self.Font = QFont("Anton-Regular", 40)
-        self.Font.setBold(True)
 
         self.shortcut_q = QShortcut(QKeySequence("ctrl+q"), self)
         self.shortcut_q.activated.connect(sys.exit)
