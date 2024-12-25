@@ -1,4 +1,4 @@
-import sys, time
+import os, sys, time
 
 from PyQt5.QtWidgets import (
     QStackedLayout,
@@ -19,18 +19,16 @@ from PyQt5.QtCore import (
     pyqtSignal
 )
 from PyQt5.QtGui import (
-    QFont,
     QKeySequence,
-    QIntValidator,
-    QFontDatabase
+    QIntValidator
 )
+
+HOMEDIR = os.path.expanduser("~")
 
 class Main_window(QMainWindow):
     def __init__(self, title:str):
         super(Main_window, self).__init__()
-
-        self.Font = QFont("Arial", 40)
-
+        
         self.shortcut_q = QShortcut(QKeySequence("ctrl+q"), self)
         self.shortcut_q.activated.connect(sys.exit)
 
@@ -42,10 +40,8 @@ class Main_window(QMainWindow):
         self.layout_stak = QStackedLayout()
 
         self.timer = Timer()                   
-        self.timer.setFont(self.Font)
 
-        self.timer_input = Time_input(1, 0)             # Change to default value from a config file
-        self.timer_input.setFont(self.Font)
+        self.timer_input = Time_input(0, 0)             # Change to default value from a config file
         self.start_btn = QPushButton(text="Start")
         self.reset_btn = QPushButton(text="Reset")
 
@@ -64,6 +60,12 @@ class Main_window(QMainWindow):
         widget = QWidget()
         widget.setLayout(layout_vert)
         self.setCentralWidget(widget)
+
+        #self.timer_input.setObjectName("timer_input")
+        self.timer_input.minutes.setObjectName("timer_input")
+        self.timer_input.seconds.setObjectName("timer_input")
+        self.start_btn.setObjectName("start")
+        self.reset_btn.setObjectName("reset")
 
         self.show()
 
@@ -97,6 +99,7 @@ class Timer(QWidget):
         self.setLayout(self.layout)
 
         self.label = QLabel()
+        self.label.setObjectName("timer")
   
         self.layout.addWidget(self.label)
 
@@ -135,14 +138,17 @@ class Time_input(QWidget):
 
         widget = QWidget
 
+        size_policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
         self.minutes = QLineEdit()
         self.seconds = QLineEdit()
 
-        self.minutes.setFixedSize(100, 110)
-        self.seconds.setFixedSize(100, 110)
+        self.minutes.setSizePolicy(size_policy)
+        self.seconds.setSizePolicy(size_policy)
+        self.minutes.setAlignment(Qt.AlignRight)
         self.minutes.setPlaceholderText("{:02d}".format(def_min))
         self.seconds.setPlaceholderText("{:02d}".format(def_sec))
 
@@ -165,12 +171,20 @@ class Time_input(QWidget):
         
         return (int(minutes), int(seconds))
 
-class Float_window(QWidget):
-    pass
 
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     window = Main_window("Tamatar")
+
+    
+    if os.name == "posix":
+        Config_file = os.path.join(HOMEDIR, ".config/tamatar/config.qss")
+
+    try:
+        with open(Config_file) as data:
+            app.setStyleSheet(data.read())
+    except IOError:
+        print(f"Config file doesn't exist!\nCreate {Config_file}")
 
     app.exec()

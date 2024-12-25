@@ -1,0 +1,22 @@
+QMainWindow {
+    background-color: #E8ECD7;
+}
+#timer_input {
+    color: red;
+    font-size: 60px;
+    border: 1px solid red;
+}
+#timer {
+    color: red;
+    font-size: 60px
+}
+
+#start {
+    color: #47663B;
+    font-size: 20px;
+}
+
+#reset {
+    color: #47663B;
+    font-size: 20px;
+}
