@@ -29,8 +29,7 @@ class Main_window(QMainWindow):
     def __init__(self, title:str):
         super(Main_window, self).__init__()
 
-        QFontDatabase.addApplicationFont("./assets/font/Anton-Regular.otf")
-        self.Font = QFont("Anton-Regular", 40)
+        self.Font = QFont("Arial", 40)
 
         self.shortcut_q = QShortcut(QKeySequence("ctrl+q"), self)
         self.shortcut_q.activated.connect(sys.exit)
