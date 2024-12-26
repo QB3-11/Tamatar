@@ -10,7 +10,7 @@ A pomodoro timer written in Python
 
 ## Installation (Linux)
 ```
-git clone https://github.com/kovidgoyal/calibre.git
+git clone https://github.com/QB3-11/Tamatar.git
 cd Tamatar
 python3 -m venv venv
 source venv/bin/activate
@@ -22,7 +22,7 @@ cp themes/config.qss ~/.config/tamatar/
 
 ## Installation (Windows)
 ```
-git clone https://github.com/kovidgoyal/calibre.git
+git clone https://github.com/QB3-11/Tamatar.git
 cd Tamatar
 python -m venv venv
 venv\Scripts\activate
