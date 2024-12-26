@@ -182,7 +182,7 @@ if __name__ == "__main__":
         Config_file = os.path.join(HOMEDIR, ".config/tamatar/config.qss")
     
     elif os.name == "nt":
-        Config_file = HOMEDIR
+        Config_file = os.path.join(HOMEDIR, "config.qss")
 
     try:
         with open(Config_file) as data:
