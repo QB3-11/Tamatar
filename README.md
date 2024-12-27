@@ -16,7 +16,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 pyinstaller tamatar.spec
-mkdir ~/.config/tamtar 
+mkdir ~/.config/tamatar 
 cp themes/config.qss ~/.config/tamatar/
 ```
 
