@@ -104,21 +104,28 @@ class Timer(QWidget):
         self.layout.addWidget(self.label)
 
     def countdown(self):
-        self.thread = Worker(self.t)
+        self.thread = Worker(self.t, self.label)
         self.threads.append(self.thread)
         self.thread.start()
         self.thread.progress.connect(self.update_timer)
-        
+        self.thread.blink.connect(self.blinker) 
+
     def update_timer(self, inp:tuple):
         self.label.setText("{:02d}:{:02d}".format(inp[0], inp[1]))
     
+    def blinker(self, signal:int):
+        if signal == 1:
+            self.setVisible(not self.isVisible())
+    
 class Worker(QThread):
 
-    def __init__(self, t):
+    def __init__(self, t, label):
         super(Worker, self).__init__()
         self.t = t
+        self.timer_label = label
 
     progress = pyqtSignal(tuple)
+    blink = pyqtSignal(int)
     def run(self):
         while self.t > -1:
             mins, secs = divmod(self.t, 60)
@@ -126,6 +133,9 @@ class Worker(QThread):
             time.sleep(1)
 
             self.t -= 1
+        while True:
+            self.blink.emit(1)
+            time.sleep(.4)
 
 class Time_input(QWidget):
     def __init__(self, def_min, def_sec):
